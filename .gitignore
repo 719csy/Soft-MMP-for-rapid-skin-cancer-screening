@@ -1,0 +1,47 @@
+# Python/runtime artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+.venv-*/
+venv/
+env/
+
+# Local editors
+.vscode/
+.idea/
+
+# Training/checkpoint outputs
+checkpoint*/
+checkpoints/
+cache/
+logs/
+*.pt
+*.pth
+*.ckpt
+*.log
+train_log*.jsonl
+test_metrics.json
+test_sample_metrics.csv
+smoke_test_artifacts/
+
+# Local research data and exports not cleared for public release
+pressure/
+LR_up/
+statistic check/
+Data total.xlsx
+*Clincal_ontology*
+*OneDrive*
+*My Drive*
+raw_data/
+real_data/
+patient_data/
+
+# Notebook checkpoints and OS noise
+.ipynb_checkpoints/
+.DS_Store
+Thumbs.db
+

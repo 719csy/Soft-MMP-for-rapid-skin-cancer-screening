@@ -1,0 +1,10 @@
+{
+  "config": "srcnn_8x8_to_32x32\\config.paper.yaml",
+  "input": "srcnn_8x8_to_32x32\\examples\\toy_input_8x8.csv",
+  "checkpoint": null,
+  "output_csv": "srcnn_8x8_to_32x32\\examples\\toy_output_32x32.csv",
+  "output_png": "srcnn_8x8_to_32x32\\examples\\toy_output_32x32.png",
+  "input_size": 8,
+  "target_size": 32,
+  "checkpoint_loaded": false
+}

@@ -1,0 +1,10 @@
+{
+  "config": "srcnn_8x8_to_32x32\\config.paper.yaml",
+  "input": "G:\\My Drive\\rigidity_interpolation\\srcnn_8x8_to_32x32\\examples\\toy_input_8x8.csv",
+  "checkpoint": null,
+  "output_csv": "release\\toy_outputs\\toy_fig4_placeholder_32x32.csv",
+  "output_png": "release\\toy_outputs\\toy_fig4_placeholder_32x32.png",
+  "input_size": 8,
+  "target_size": 32,
+  "checkpoint_loaded": false
+}

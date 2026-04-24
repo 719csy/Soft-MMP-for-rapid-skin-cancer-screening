@@ -1,0 +1,25 @@
+data:
+  input_size: 8
+  target_size: 32
+  target_field: mean_kpa
+  input_column: input_8x8_csv
+  target_column: target_32x32_csv
+  data_status: "Final true-8x8 simulation maps are pending; bundled examples are synthetic."
+
+model:
+  name: SRCNN8x8To32x32
+  channels: [64, 32]
+  upsampling: bicubic
+  activation: sigmoid
+
+training:
+  seed: 42
+  batch_size: 4
+  epochs: 200
+  lr: 0.0001
+  weight_decay: 0.0
+
+inference:
+  allow_random_init: true
+  output_prefix: prediction_32x32
+
