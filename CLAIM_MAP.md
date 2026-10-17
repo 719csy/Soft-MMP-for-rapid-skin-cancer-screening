@@ -1,33 +1,21 @@
-# Public Claim Map
+# Manuscript figure and code correspondence
 
-This public claim map tracks the code artifacts needed to support the manuscript-facing repository. It is intentionally conservative: experimental wet-lab protocols, raw human data, patient-linked metadata, and uncleared fabrication files are not expected in this public code release.
+This map describes the current public checkout. An implemented interface does not establish that it produced the manuscript results. All sensor-input heatmaps in this release use an 8 × 8 array; reconstructed outputs use a 32 × 32 grid.
 
-## Status Legend
+| Manuscript output or claim | Public implementation | What can be reproduced now | What is missing |
+|---|---|---|---|
+| SRCNN architecture and 8 × 8 input interface | `model.py`, `infer.py`, `config.example.yaml` | Input/output dimensions and forward execution | Original trained weights and historical run settings |
+| Training, normalization and held-out evaluation | `train.py`, `dataset.py`, `metrics.py` | One-pair smoke training; grouped workflow on user-supplied data | Actual study dataset, independent-unit identifiers, original splits and counts |
+| Fig. 4g architecture | `model.py` | Three-layer sigmoid architecture and bicubic upsampling | Original schematic artwork; this is architectural correspondence only |
+| Fig. 4h reconstruction comparison | `infer.py` provides the numerical interface | No manuscript panel or numerical result | Paired source data, calibration, checkpoint, panel mapping and plotting script |
+| Fig. 4i–k phantom validation, including the 8 × 8 input heatmap | Shape-checked input and reconstructed-output export | No manuscript phantom result | Independent phantom records, reference/loaded maps, calibration, targets and original checkpoint |
+| Supplementary Fig. 21 modelled lesion inputs and modulus reconstructions | Generic 8 × 8 to 32 × 32 interface only | No numbered panel; historical generating pipeline remains unverified | Original inputs, ground truth, group identities, checkpoint, generation script and display settings |
+| Fig. 4a–f and other experimental results | Not implemented here | No corresponding manuscript result | Acquisition, calibration, specimen/phantom data and analysis scripts |
+| Morphology, histology and PET comparisons | Not implemented here | No corresponding manuscript result | Registration, source data and analysis workflows |
+| Hardware/firmware and finite-element simulations | Not implemented here | No corresponding acquisition or simulation result | Hardware, firmware, model files and export procedures |
 
-- **GREEN**: public and manuscript-matched.
-- **YELLOW**: public but partial, legacy, or waiting on final data.
-- **RED**: not yet public in this repository.
-- **N/A**: experimental or wet-lab method where public code is not required.
-- **MOVE**: canonical public home should be a companion repository.
+## Interpretation of generated files
 
-## Claims
+The synthetic example can reproduce only the repository's demonstration input and execution workflow. `--smoke_test` predictions and checkpoints are demonstrations, regardless of their visual appearance. They must not be relabeled as manuscript panels or used to validate the reported improvements.
 
-| ID | Method / claim | Public artifact | Current status | Minimum public artifact |
-|---|---|---|---|---|
-| NS-01 | Hall-sensor signal to stiffness-map pipeline | Documentation and interface files | RED | Add measurement pipeline docs and schemas |
-| NS-02 | Device optimization | Optional data/doc | N/A | Optional cleared figure data |
-| NS-03 | Phantom calibration to Young's modulus | Calibration script | RED | Add toy phantom calibration example |
-| NS-04 | Depth-resolved phantom evaluation | Analysis script | RED | Add depth-vs-contrast toy workflow |
-| NS-05 | Wireless 64-channel acquisition stack | Companion hardware repo | MOVE | Publish protocol and channel map in hardware repo |
-| NS-06 | AI-assisted SRCNN super-resolution | `srcnn_8x8_to_32x32/` | GREEN for code interface; YELLOW for final data | Publish true 8x8-to-32x32 code, config, toy data, and smoke tests |
-| NS-07 | Bx/By/Bz field reconstruction and export handling | Field mapping utilities | RED | Add export parser and sample schema |
-| NS-08 | In vivo/ex vivo stiffness analysis | De-identified analysis scripts | RED | Add toy tables and representative analysis script |
-| NS-09 | Morphology, anisotropy, boundary extraction | Morphology analysis script | RED | Add contour and anisotropy example |
-| NS-10 | Histology-linked comparison | Optional cross-link | YELLOW | Add note or alignment script after clearance |
-| NS-11 | COMSOL finite-element simulation | Companion simulation repo | MOVE | Publish redacted exports and post-processing scripts |
-| NS-12 | Animal/human validation protocols | Protocol note only | N/A | Optional non-sensitive methods note |
-
-## SRCNN Release Scope
-
-The current upload closes the main public-code gap for NS-06 by adding a manuscript-aligned package interface for 8x8 Hall input to 32x32 map output. The package does not claim final figure reproduction while the 8x8 simulation dataset remains pending.
-
+No public command currently claims exact Fig. 4 or Supplementary Fig. 21 reproduction. Once source assets are available, each panel should be linked to its input/target identifiers, independent group, split, preprocessing configuration, checkpoint SHA-256, script revision, command and plotting limits. The original figure provenance must be verified from those records, not inferred from this updated implementation.

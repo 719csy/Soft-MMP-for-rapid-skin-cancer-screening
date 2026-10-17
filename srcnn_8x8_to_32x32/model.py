@@ -12,14 +12,16 @@ class SRCNN8x8To32x32(nn.Module):
         super().__init__()
         self.input_size = int(input_size)
         self.target_size = int(target_size)
+        if (self.input_size, self.target_size) != (8, 32):
+            raise ValueError("This package requires an 8x8 sensor array and a 32x32 reconstruction grid")
         hidden1, hidden2 = channels
         self.conv1 = nn.Conv2d(1, hidden1, kernel_size=9, padding=4)
         self.conv2 = nn.Conv2d(hidden1, hidden2, kernel_size=5, padding=2)
         self.conv3 = nn.Conv2d(hidden2, 1, kernel_size=5, padding=2)
 
     def upsample(self, x: torch.Tensor) -> torch.Tensor:
-        if x.shape[-2:] == (self.target_size, self.target_size):
-            return x
+        if x.ndim != 4 or x.shape[1:] != (1, self.input_size, self.input_size):
+            raise ValueError("Expected a batch of single-channel 8x8 sensor maps")
         return F.interpolate(
             x,
             size=(self.target_size, self.target_size),

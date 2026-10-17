@@ -1,0 +1,22 @@
+{
+  "source": "generate_toy.py analytic Gaussian pattern",
+  "measured_data": false,
+  "sample_count": 1,
+  "synthetic_pattern_count": 1,
+  "biological_specimens": 0,
+  "physical_phantoms": 0,
+  "split_counts": {
+    "train": 1,
+    "val": 0,
+    "test": 0
+  },
+  "input_shape": [
+    8,
+    8
+  ],
+  "target_shape": [
+    32,
+    32
+  ],
+  "manuscript_dataset": false
+}

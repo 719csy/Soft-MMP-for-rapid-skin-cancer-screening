@@ -38,6 +38,8 @@ def _validate_shape(array: np.ndarray, expected_shape: tuple[int, int] | None, p
         raise ValueError(f"{path}: expected a 2D CSV grid, got shape {array.shape}")
     if expected_shape is not None and tuple(array.shape) != tuple(expected_shape):
         raise ValueError(f"{path}: expected shape {expected_shape}, got {array.shape}")
+    if not np.isfinite(array).all():
+        raise ValueError(f"{path}: grid contains non-finite values")
     return array.astype(np.float32)
 
 
@@ -59,20 +61,13 @@ def read_grid_csv(
         )
         return _validate_shape(grid, expected_shape, path)
 
-    attempts = [
-        pd.read_csv(path, index_col=0),
-        pd.read_csv(path, header=None),
-        frame,
-    ]
-    for candidate in attempts:
-        array = _numeric_array(candidate)
-        if array is None:
-            continue
-        if expected_shape is None or tuple(array.shape) == tuple(expected_shape):
-            return _validate_shape(array, expected_shape, path)
-
-    expected = f" with shape {expected_shape}" if expected_shape else ""
-    raise ValueError(f"{path}: could not read a numeric CSV grid{expected}")
+    # Only strip an explicitly named axis. Numeric rows/columns are data,
+    # never implicit headers that can conceal an incorrect sensor shape.
+    candidate = pd.read_csv(path, index_col=0) if frame.columns[0] == "y_norm" else pd.read_csv(path, header=None)
+    array = _numeric_array(candidate)
+    if array is None:
+        raise ValueError(f"{path}: expected a finite numeric matrix or an explicitly labeled y_norm grid")
+    return _validate_shape(array, expected_shape, path)
 
 
 def write_grid_csv(path: str | Path, array: np.ndarray, axis_min: float = -1.0, axis_max: float = 1.0) -> None:
@@ -90,7 +85,7 @@ def write_grid_csv(path: str | Path, array: np.ndarray, axis_min: float = -1.0, 
     frame.to_csv(path, float_format="%.8f")
 
 
-def save_heatmap(path: str | Path, array: np.ndarray, title: str, cmap: str = "viridis") -> None:
+def save_heatmap(path: str | Path, array: np.ndarray, title: str, cmap: str = "viridis", units: str = "") -> None:
     import matplotlib
 
     matplotlib.use("Agg")
@@ -99,12 +94,15 @@ def save_heatmap(path: str | Path, array: np.ndarray, title: str, cmap: str = "v
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     fig, axis = plt.subplots(figsize=(4.0, 3.6), dpi=180)
-    image = axis.imshow(np.asarray(array), cmap=cmap)
+    image = axis.imshow(np.asarray(array), cmap=cmap, interpolation="nearest")
     axis.set_title(title, fontsize=9)
-    axis.set_xlabel("x")
-    axis.set_ylabel("y")
+    axis.set_xlabel("Column index")
+    axis.set_ylabel("Row index")
+    if np.asarray(array).shape == (8, 8):
+        axis.set_xticks(range(8))
+        axis.set_yticks(range(8))
     axis.tick_params(labelsize=7)
-    fig.colorbar(image, ax=axis, fraction=0.046, pad=0.04)
+    fig.colorbar(image, ax=axis, fraction=0.046, pad=0.04, label=units)
     fig.tight_layout()
     fig.savefig(path, bbox_inches="tight")
     plt.close(fig)

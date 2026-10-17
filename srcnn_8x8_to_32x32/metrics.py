@@ -7,6 +7,12 @@ import torch.nn.functional as F
 EPS = 1e-8
 
 
+def negative_psnr_loss(prediction: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
+    """Mean per-map negative PSNR with normalized data range 1."""
+    mse = (prediction - target).square().flatten(1).mean(dim=1)
+    return (10.0 * torch.log10(mse.clamp_min(EPS))).mean()
+
+
 def psnr(prediction: torch.Tensor, target: torch.Tensor) -> float:
     mse = F.mse_loss(prediction, target)
     value = 10.0 * torch.log10(1.0 / torch.clamp(mse, min=EPS))

@@ -1,2 +1,2 @@
-sample_id,split,input_8x8_csv,target_32x32_csv
-toy_soft_mmp_001,train,toy_input_8x8.csv,toy_target_32x32.csv
+sample_id,group_id,split,input_8x8_csv,target_32x32_csv
+toy_001,synthetic_pattern_001,train,toy_input_8x8.csv,toy_target_32x32.csv
