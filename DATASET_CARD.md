@@ -1,55 +1,108 @@
 # Dataset and checkpoint provenance
 
-The public synthetic example and the manuscript study dataset are separate resources. Counts below must not be substituted for the manuscript's sample size.
+This record distinguishes the archived modelled-lesion experiment from the current public 8 × 8 → 32 × 32 implementation. Counts and metrics from one must not be attributed to the other. The source archive was audited on 16 October 2026; file hashes are in [archived_run.json](provenance/archived_run.json).
+
+## Archived dataset size and unit of analysis
+
+The pairing inventory contains 81 candidate lesion IDs. Three ISIC2018 cases were excluded because their Bz source records were absent. The retained dataset contains **78 different modelled lesion IDs and 78 input–target pairs**, one pair per ID.
+
+| Source cohort | Training | Validation | Test | Total |
+|---|---:|---:|---:|---:|
+| ISIC2018 | 27 | 4 | 8 | 39 |
+| MIDAS | 19 | 3 | 5 | 27 |
+| PH2 | 9 | 1 | 2 | 12 |
+| **Total** | **55** | **8** | **15** | **78** |
+
+The actual fractions are 70.51%, 10.26% and 19.23%; the stated 70%/10%/20% proportions are nominal. The same counts apply to pairs and lesion IDs.
+
+The partition unit was the **modelled lesion ID**, stratified by source cohort. There are zero physical phantoms and zero measured-modulus specimens in this training cohort. These counts do not describe separate phantom experiments elsewhere in the manuscript. The archived partition uses lesion IDs, with no patient/specimen parent identifier; it supports lesion-level separation, not a claim of patient-level or specimen-level independence.
+
+[lesion_split_manifest.csv](provenance/lesion_split_manifest.csv) records every retained ID, source cohort, split and source-file hash. Membership was reconstructed from the saved paired IDs and the historical split routine using seed 42. All 15 reconstructed test IDs exactly match the saved per-sample test table. This is a reconstructed provenance manifest, not a newly randomized split or a contemporaneously saved training manifest.
+
+Within each sorted source cohort, the historical routine shuffled sorted IDs using one `random.Random(42)` generator. It assigned the first rounded 20% to test and rounded 12.5% of the remaining cases to validation; the rest went to training. Cohorts were processed in sorted order. All maps associated with one retained lesion were combined into its single paired sample before this split.
+
+## Sample generation and array meaning
+
+Each lesion's modelled modulus target was the `mean_kpa` field from `interp_mean_kpa.csv`. These dermoscopy-derived modulus priors were inputs to the forward model, not experimentally measured clinical modulus ground truth.
+
+For each lesion, COMSOL Bz exports carrying load labels 0 and 0.08 supplied the reference and loaded fields. Their pointwise absolute difference formed the input. The archived configuration records a sensor plane at z = 0.5 mm and 25 field-sampling sites within the model's 0–10 mm field of view. The field differences were bicubically interpolated to the **64 × 64 reconstruction grid**, and paired with the lesion's modulus target on that grid. One full-map pair per lesion was used; the historical training routine applied no crop or augmentation expansion.
+
+The later `hall8_conditioning_exports` process generated **8 × 8 field-display arrays** by bicubic resampling of the cached field differences, with `align_corners=False`. All 78 saved display arrays were checked against that operation. The export produced no new independent simulation, measurement or trained checkpoint. Thus an 8 × 8 displayed array must not be described as evidence of 64 independently acquired field samples in this archived experiment.
+
+The public software accepts prepared **8 × 8 input matrices** and reconstructs on a **32 × 32 output grid**. That interface is separate from the archived experiment above.
+
+## Archived training and selected checkpoint
+
+| Setting | Recorded value |
+|---|---|
+| Seed | 42 |
+| Epochs / batch size | 200 / 8 |
+| Optimizer | Adam |
+| Learning rate / weight decay | 0.0001 / 0 |
+| Loss | Negative PSNR from normalized batch MSE, data range 1, epsilon 1e-8 |
+| Network | Three convolution layers, channels 1 → 64 → 32 → 1; sigmoid after each |
+| Kernel widths | 9, 5, 5 |
+| Augmentation / dropout / early stopping / learning-rate schedule | None |
+| Input normalization range | 8.737906455993652–32.03804397583008 mT |
+| Target normalization range | 71.17301940917969–240.06137084960938 kPa |
+| Normalization source | Training maps only |
+| Checkpoint selection | Highest mean PSNR across the 8 validation lesions |
+| Selected file / epoch | `best.pt` / 196 |
+| Selected validation PSNR | 13.593811869621277 dB |
+
+Checkpoint source: the author-held `checkpoint_srcnn_realbz_mean_kpa` run archive. The saved checkpoint is 695,297 bytes and has SHA-256:
+
+```text
+bb1b02629de706c05e22b7f3d44b6f7528d5fcbd985f9cec3b7ee05dc66212bd
+```
+
+Its stored epoch and validation score agree with the maximum in the complete 200-epoch log. Training-split extrema were recomputed from the 55 cached pairs and exactly equal the saved normalization values. The historical dataset loader applies training min/max without clipping. The comparison baseline clips normalized field inputs to [0, 1] before mapping them to the target range.
+
+The archived checkpoint belongs to the 64 × 64 reconstruction experiment. Its convolutional weights must not be described as a checkpoint trained for the current 8 × 8 → 32 × 32 interface merely because the convolution architecture is similar.
+
+## Archived held-out performance
+
+The saved metrics are means over the 15 test lesions, evaluated after validation-based checkpoint selection.
+
+| Metric | Selected SRCNN | Range-matched field baseline |
+|---|---:|---:|
+| PSNR (dB) | 14.184524 | 9.851483 |
+| SSIM | 0.415746 | 0.209405 |
+| MAE (kPa) | 26.922670 | 44.439748 |
+| RMSE (kPa) | 33.344205 | 54.862346 |
+
+PSNR and SSIM use training-normalized targets with data range 1. SSIM uses a uniform window of width 7, stride 1, zero padding of 3, and constants 0.01² and 0.03². MAE and RMSE use denormalized values in kPa. The figures above are archived experiment results, not results of the public synthetic example or the current interface. Independent CPU inference on all 15 test cases was compared with the saved per-case metrics; numerical differences are recorded in [audit_results.json](provenance/audit_results.json).
+
+## Supplementary Fig. 21
+
+The numerical source chain is the archived training cache and epoch-196 checkpoint, the `SI_Fig21_regenerated` output package, and the recorded October 5 presentation revision. The two modelled lesions are:
+
+| Case | Modelled lesion category | Split | Saved test PSNR (dB) |
+|---|---|---|---:|
+| `midas_lesion_626` | Keratinocytic carcinoma in situ | Test | 13.274233 |
+| `midas_lesion_218` | Melanoma in situ | Test | 11.938630 |
+
+The 8 × 8 field-display exports, SRCNN numerical reconstructions, modelled targets and dermoscopy probability maps have separate source records. Reconstruction and target arrays use the archived 64 × 64 numerical grid. The shared modulus scale is 71.17301940917969–240.06137084960938 kPa.
+
+The probability map is a **stage-1 dermoscopy segmentation probability**, averaged over the lesion's views and bilinearly resampled to the reconstruction grid. It is not SRCNN reconstruction confidence or uncertainty. Both figure reconstructions were independently recomputed from the identified checkpoint and compared with the saved figure CSVs. The figure script clips its normalized input to [0, 1]; neither of these two cases has values changed by that clipping. Source hashes also match the preserved-data entries in the presentation revision manifest.
+
+[supplementary_fig21.json](provenance/supplementary_fig21.json) records the two cases, checkpoint identity, numerical-source hashes, original generation-script hash and comparison errors. It identifies the numerical source chain; it does not assert that the October 5 presentation layout is byte-identical to every later manuscript layout.
 
 ## Public synthetic example
 
 | Item | Exact public value |
-|---|---|
-| Input/target pairs | 1 |
-| Independent synthetic patterns | 1 |
-| Biological lesions/specimens | 0 |
-| Physical phantoms | 0 |
-| Training / validation / test pairs | 1 / 0 / 0 |
-| Training / validation / test groups | 1 / 0 / 0 |
-| Sensor-input grid | 8 × 8 |
-| Reconstruction-target grid | 32 × 32 |
+|---|---:|
+| Input/target pairs / synthetic patterns | 1 / 1 |
+| Biological lesions/specimens / physical phantoms | 0 / 0 |
+| Training / validation / test pairs and groups | 1 / 0 / 0 |
 | Included trained checkpoints | 0 |
 
-`generate_toy.py` samples an analytic Gaussian g(x,y) = exp(-((x - 0.15)^2 + (y + 0.1)^2) / 0.18), on regularly spaced coordinates from -1 to 1. The synthetic input is 0.2 + 0.8g on the input grid; the illustrative target is 80 + 120g on the target grid. The latter is labeled synthetic modulus in kPa for interface demonstration only. It is not a calibrated magnetic-field-to-modulus relation, COMSOL simulation, measurement or manuscript sample. There is no random augmentation, cropping, strain series or test-set performance claim in this example.
+The analytic pattern is g(x,y) = exp(-((x - 0.15)² + (y + 0.1)²) / 0.18), on regularly spaced coordinates from -1 to 1. The illustrative input is 0.2 + 0.8g on an 8 × 8 grid; the target is 80 + 120g on a 32 × 32 grid. This is an interface demonstration, not a calibrated field-to-modulus relation, COMSOL result or manuscript sample. The example is assigned to `synthetic_pattern_001` in the training split. A smoke-training checkpoint is newly fitted to this one pair.
 
-`toy_manifest.csv` assigns the pair to `synthetic_pattern_001` and the training split. Regeneration is deterministic. A local smoke-training checkpoint is newly trained from this one pair and is never a manuscript-trained checkpoint.
+## Contract for new public-interface runs
 
-## Manuscript dataset information still required
+Required manifest columns are `sample_id,group_id,split,input_8x8_csv,target_32x32_csv`. IDs must be unique and splits explicit. Paths are relative to the manifest. The group must identify the independent experimental unit; related loads, maps, crops and augmentations remain in that group. Lesions sharing a specimen or simulation parent must use the shared parent ID. No automatic row split is performed.
 
-The supplied revised manuscript describes deformation-induced inputs, the absolute difference between loaded and unloaded Bz maps, bicubic upsampling to 32 × 32, three sigmoid convolutional layers, a negative-PSNR loss, a 70%/10%/20% split, training-only normalization and selection on validation data. These statements do not establish the following missing information:
+The loader checks finite dimensions and rejects groups or byte-identical inputs/targets crossing splits. Hashes do not identify every semantic duplicate. Supported CSV layouts are axis-labeled matrices (`y_norm` header), headerless matrices, and target long tables with `x_norm,y_norm,mean_kpa`. Inputs must already contain the intended absolute field difference.
 
-| Required study record | Current status |
-|---|---|
-| Total paired maps before and after exclusions/augmentation | Not provided in the public release; exact count unverified |
-| Number of independent simulated lesions and physical phantoms/specimens | Not provided; these categories must be counted separately |
-| Exact train/validation/test map and independent-unit counts | Not provided; percentages alone do not establish counts |
-| Unit used to assign the original study split | Unverified; evaluating one lesion at a time does not prove a grouped split |
-| Sample-generation procedure | Complete simulation parameters, sampling/channel order, units, load/reference pairing, calibration and augmentation records are absent |
-| Repeated measurements and derived samples | Relationship between specimen, lesion, load/strain level, crop, augmentation and source simulation must be recorded |
-| Original training run | Exact settings, software versions, seed, normalization values and saved split manifest are absent |
-| Manuscript checkpoint | File, identifier/hash, validation-selection record and accessible source are absent |
-| Fig. 4 and Supplementary Fig. 21 provenance | Per-panel input, target, checkpoint, processing script and plotting settings are absent |
-
-The original checkpoint source and Supplementary Fig. 21 generation path therefore remain **unverified**. Shared dimensions or similar appearance do not establish that a current script generated a published panel. The manuscript describes a common 71–240 kPa display scale for Supplementary Fig. 21; that display range is not evidence of the training normalization range and is not imposed on the synthetic example.
-
-## Manifest contract for a study release
-
-Required CSV columns are `sample_id,group_id,split,input_8x8_csv,target_32x32_csv`. `sample_id` must be unique; `split` must explicitly be `train`, `val` or `test`. Paths are relative to the manifest. `group_id` must identify the independent experimental unit: for example, a specimen or independently generated simulated lesion. All related maps, repeated loads, crops and augmentations must stay with that unit. When lesions share a specimen or simulation source, use the shared parent as the grouping unit. The code cannot infer these relationships from images.
-
-Training rejects missing split information, groups crossing splits and byte-identical input or target files crossing splits. Hash checks do not detect all semantic duplicates; authors must supply valid provenance and related-sample identifiers. No automatic random row split is performed. Report both map counts and independent-unit counts, with any rounding or unequal group sizes explaining deviations from nominal percentages. The present code enforces this contract for new runs; it does not establish how the historical study was split.
-
-The loader accepts an explicitly axis-labeled matrix (`y_norm` header), a headerless numeric matrix, or a target long table with `x_norm,y_norm,mean_kpa`. Inputs must be finite 8 × 8 matrices and targets finite 32 × 32 matrices. Input CSVs must already contain the intended loaded-minus-unloaded absolute difference; the model does not calculate it from an unpaired map or infer channel ordering.
-
-## Checkpoint and evaluation contract
-
-A checkpoint stores `model_state`, `norm_stats`, `config`, `epoch` and `provenance`. The run summary records the manifest/config hashes, sample hashes and group membership, actual settings, seed, software environment and selected-checkpoint SHA-256. `best.pt` is selected by validation PSNR averaged first within each group and then across groups. The test split is evaluated only after training finishes and the selected validation checkpoint is loaded. The smoke test uses `last.pt` when validation data are absent and reports no test metrics.
-
-Min/max statistics come only from training maps. They are reused unchanged for held-out data and inference. Values outside the training range are not clipped; the sigmoid output remains bounded by the training target range. Metrics are reported on this normalized scale, with PSNR data range 1; they are not physical-unit errors. Public SSIM uses a local uniform window of size 7 and constants 0.01² and 0.03². The exact historical preprocessing and metric implementation still require verification.
-
-To establish manuscript reproducibility, release or provide a documented access route for the actual dataset, split manifest and original checkpoint, with hashes and panel-level mapping. If release is restricted, state the specific unavailable assets, reason and access conditions once confirmed. The current repository does not assert that these assets are unavailable in principle.
+New checkpoints store `model_state`, `norm_stats`, `config`, `epoch` and `provenance`. The public trainer selects `best.pt` by validation PSNR averaged within groups and then across groups; test evaluation follows selection. A smoke run without validation saves `last.pt`. Public PSNR/SSIM are normalized image metrics. The public code and metadata describe new runs; the archived records above describe the historical experiment.

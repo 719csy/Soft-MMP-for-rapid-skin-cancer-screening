@@ -116,7 +116,7 @@ def run_inference(
     metadata_path = out_dir / "inference_metadata.json"
     write_grid_csv(csv_path, prediction)
     is_demo = checkpoint_path is None or checkpoint_provenance.get("run_kind") == "smoke_test"
-    label = "DEMO ONLY" if is_demo else "User checkpoint; figure provenance unverified"
+    label = "DEMO ONLY" if is_demo else "User-supplied checkpoint"
     units = data_cfg.get("target_units", "target units") if norm_stats else "Normalized output (a.u.)"
     save_heatmap(png_path, prediction, title=f"{label}\n32x32 reconstruction from 8x8 array", units=units)
     input_png = out_dir / f"{output_prefix}_input_8x8.png"

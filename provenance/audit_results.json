@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "audit_date": "2026-10-16",
+  "environment": {
+    "python": "3.12.7",
+    "numpy": "1.26.4",
+    "pandas": "2.2.2",
+    "torch": "2.12.0+cpu",
+    "device": "cpu",
+    "threads": 1
+  },
+  "checks": {
+    "all_78_cache_ids_unique": true,
+    "all_78_cache_grids_finite": true,
+    "all_78_display_grids_8x8": true,
+    "all_15_reconstructed_test_ids_equal_saved_test_ids": true,
+    "training_normalization_equals_saved_values": true,
+    "checkpoint_epoch_equals_validation_maximum": true,
+    "all_200_epochs_present": true,
+    "all_figure_csv_hashes_equal_presentation_manifest": true,
+    "figure_probability_arrays_equal_source": true
+  },
+  "max_abs_difference_recomputed_8x8_export_mT": 5.000000413701855e-09,
+  "max_abs_difference_recomputed_test_metrics": {
+    "pred_psnr": 1.9073486310361432e-06,
+    "pred_ssim": 1.6689300537109375e-06,
+    "pred_mae_raw": 3.814697265625e-06,
+    "pred_rmse_raw": 3.814697272730427e-06,
+    "baseline_psnr": 1.7763568394002505e-15,
+    "baseline_ssim": 5.960464477539063e-08,
+    "baseline_mae_raw": 7.105427357601002e-15,
+    "baseline_rmse_raw": 7.62939453125e-06
+  },
+  "test_metric_comparison_absolute_tolerance": 0.0002,
+  "figure_reconstruction_comparison_absolute_tolerance_kPa": 0.0002
+}

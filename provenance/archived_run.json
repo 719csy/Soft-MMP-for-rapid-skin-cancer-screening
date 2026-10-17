@@ -1,0 +1,197 @@
+{
+  "schema_version": 1,
+  "audit_date": "2026-10-16",
+  "run_id": "checkpoint_srcnn_realbz_mean_kpa",
+  "scope": "Archived modelled-lesion run linked to Supplementary Fig. 21; distinct from the current public 8x8-to-32x32 interface.",
+  "counts": {
+    "candidate_lesion_ids": 81,
+    "paired_lesion_ids": 78,
+    "paired_maps": 78,
+    "excluded_lesion_ids": 3,
+    "physical_phantoms_in_this_training_cohort": 0,
+    "measured_modulus_specimens_in_this_training_cohort": 0,
+    "cohorts": {
+      "isic2018": {
+        "total": 39,
+        "test": 8,
+        "val": 4,
+        "train": 27
+      },
+      "midas": {
+        "total": 27,
+        "test": 5,
+        "val": 3,
+        "train": 19
+      },
+      "ph2": {
+        "total": 12,
+        "test": 2,
+        "val": 1,
+        "train": 9
+      }
+    },
+    "split_maps": {
+      "test": 15,
+      "val": 8,
+      "train": 55
+    },
+    "split_lesion_ids": {
+      "test": 15,
+      "val": 8,
+      "train": 55
+    }
+  },
+  "unit_of_partition": "One paired map per modelled lesion ID; source-cohort stratification. No patient/specimen parent identifier is encoded in the archived split.",
+  "split_manifest_origin": "Reconstructed from the saved paired IDs, seed 42 and historical stratified_split_ids routine; all 15 test IDs exactly match test_sample_metrics.csv.",
+  "historical_code_commit": "07e4aaddbb9768e9a5f0356da0cc35845f0c660b",
+  "excluded": [
+    {
+      "sample_id": "isic2018_lesion_ISIC_0034538",
+      "source_cohort": "isic2018",
+      "reason": "missing_bz_sample"
+    },
+    {
+      "sample_id": "isic2018_lesion_ISIC_0034579",
+      "source_cohort": "isic2018",
+      "reason": "missing_bz_sample"
+    },
+    {
+      "sample_id": "isic2018_lesion_ISIC_0034585",
+      "source_cohort": "isic2018",
+      "reason": "missing_bz_sample"
+    }
+  ],
+  "generation": {
+    "target": "interp_mean_kpa.csv; dermoscopy-derived modulus priors used as forward-model inputs",
+    "input": "Absolute difference between COMSOL Bz exports for load labels 0 and 0.08, paired within each lesion before splitting",
+    "load_labels": [
+      0,
+      0.08
+    ],
+    "sensor_plane_z_mm": 0.5,
+    "field_of_view_mm": [
+      0,
+      10
+    ],
+    "archived_sampling_sites": 25,
+    "archived_reconstruction_grid": [
+      64,
+      64
+    ],
+    "input_units": "mT",
+    "target_units": "kPa",
+    "maps_per_lesion": 1,
+    "augmentation": "None in the archived training routine",
+    "display_grid": [
+      8,
+      8
+    ],
+    "display_generation": "Bicubic resampling of cached field differences with align_corners=False; display export does not retrain the model or create additional independently sampled sites."
+  },
+  "training": {
+    "seed": 42,
+    "epochs": 200,
+    "batch_size": 8,
+    "optimizer": "Adam",
+    "learning_rate": 0.0001,
+    "weight_decay": 0.0,
+    "loss": "Negative PSNR; batch mean squared error; normalized data range 1; epsilon 1e-8",
+    "activation": "Sigmoid after each of three convolution layers",
+    "channels": [
+      1,
+      64,
+      32,
+      1
+    ],
+    "kernel_widths": [
+      9,
+      5,
+      5
+    ],
+    "early_stopping": false,
+    "dropout": false,
+    "learning_rate_schedule": null,
+    "normalization_source": "Training split only; input_up and target arrays; no input or target clipping in the dataset loader",
+    "normalization": {
+      "input_min": 8.737906455993652,
+      "input_max": 32.03804397583008,
+      "target_min": 71.17301940917969,
+      "target_max": 240.06137084960938
+    },
+    "checkpoint_selection": "Maximum mean validation PSNR across 8 lesions; test evaluated after best checkpoint selection"
+  },
+  "checkpoint": {
+    "filename": "best.pt",
+    "epoch": 196,
+    "sha256": "bb1b02629de706c05e22b7f3d44b6f7528d5fcbd985f9cec3b7ee05dc66212bd",
+    "size_bytes": 695297,
+    "validation_summary": {
+      "pred_psnr": 13.593811869621277,
+      "pred_ssim": 0.3521709591150284,
+      "pred_mae_raw": 29.49200129508972,
+      "pred_rmse_raw": 35.858102798461914,
+      "baseline_psnr": 9.32202684879303,
+      "baseline_ssim": 0.18193312548100948,
+      "baseline_mae_raw": 47.97672462463379,
+      "baseline_rmse_raw": 58.29082202911377
+    },
+    "source": "Author-held checkpoint_srcnn_realbz_mean_kpa archive",
+    "included_in_public_repository": false,
+    "interface_compatibility": "Archived 64x64 reconstruction run; not a checkpoint trained for the public 8x8-to-32x32 interface"
+  },
+  "test_evaluation": {
+    "lesions": 15,
+    "aggregation": "Arithmetic mean of per-lesion metrics",
+    "psnr_data_range": 1,
+    "ssim": "Uniform 7-pixel window; stride 1; zero padding 3; constants 0.01 squared and 0.03 squared",
+    "baseline": "Training-range-normalized field difference, clipped to [0,1], mapped to the target range",
+    "summary": {
+      "pred_psnr": 14.184524408976237,
+      "pred_ssim": 0.4157457153002421,
+      "pred_mae_raw": 26.92266985575358,
+      "pred_rmse_raw": 33.34420496622722,
+      "baseline_psnr": 9.851482645670574,
+      "baseline_ssim": 0.20940478431681792,
+      "baseline_mae_raw": 44.43974812825521,
+      "baseline_rmse_raw": 54.86234614054362
+    },
+    "error_units": "MAE and RMSE: kPa; PSNR: dB; SSIM: unitless"
+  },
+  "source_artifacts": [
+    {
+      "role": "archived_training_configuration",
+      "filename": "config.json",
+      "sha256": "88ba275a04345e5576a8665d81569acd5a07782440103ff0952e70fe294c0b4c"
+    },
+    {
+      "role": "paired_and_excluded_lesion_inventory",
+      "filename": "paired_samples.json",
+      "sha256": "122fbee8ab6afd349410aa1057c93852d5e1f634eee85ebdc33a430510b7c1c2"
+    },
+    {
+      "role": "all_200_epochs_and_validation_selection",
+      "filename": "train_log.jsonl",
+      "sha256": "8c247195e47ed916dd2e35542acb20354c435867337e4ebced0161a9ab1097fa"
+    },
+    {
+      "role": "archived_test_summary",
+      "filename": "test_metrics.json",
+      "sha256": "8c9943cd8790bee91cb1e8374fb65b64fd42b818ce53f6346ba113e313ff4ae8"
+    },
+    {
+      "role": "archived_15_test_lesion_metrics",
+      "filename": "test_sample_metrics.csv",
+      "sha256": "4b84445c117e8e2ff3f2552c2a788c8607ff8f82c30072da7e2eae5d2945734a"
+    },
+    {
+      "role": "8_by_8_display_export_configuration",
+      "filename": "export_config.json",
+      "sha256": "0ac5fc0da0a147b89f1c5797b37aae2914447cac3441f6edc0e3ed1beedbc7a8"
+    },
+    {
+      "role": "8_by_8_display_export_script",
+      "filename": "export_checkpoint_hall8_conditioning.py",
+      "sha256": "203eba957b317fbda138cd7f82db4fee19781c2e7f89aad390596a4f6a2190ff"
+    }
+  ]
+}

@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "audit_date": "2026-10-16",
+  "figure": "Supplementary Fig. 21",
+  "source_run_id": "checkpoint_srcnn_realbz_mean_kpa",
+  "checkpoint_sha256": "bb1b02629de706c05e22b7f3d44b6f7528d5fcbd985f9cec3b7ee05dc66212bd",
+  "checkpoint_epoch": 196,
+  "cases": [
+    {
+      "sample_id": "midas_lesion_626",
+      "diagnosis": "Keratinocytic carcinoma in situ (modelled lesion)",
+      "split": "test",
+      "test_psnr_db": 13.274232864379885,
+      "test_ssim": 0.3393681049346924,
+      "recomputed_reconstruction_max_abs_difference_kPa": 7.61718749231477e-06,
+      "figure_input_values_changed_by_clipping": 0,
+      "sources": [
+        {
+          "role": "srcnn_reconstruction",
+          "filename": "midas_lesion_626_srcnn_reconstruction_64x64_kPa.csv",
+          "sha256": "a0a13d64ff43fdf755a03bd57ddf4bee544ae6b4704ad09230ccddd03d36b699"
+        },
+        {
+          "role": "modelled_forward_input",
+          "filename": "midas_lesion_626_modelled_modulus_64x64_kPa.csv",
+          "sha256": "09fdd9337991f2d8c3e69406397461bdb5ffe29530d2c89c8f064f88e19603a8"
+        },
+        {
+          "role": "dermoscopy_probability",
+          "filename": "midas_lesion_626_lesion_probability_stage1_64x64.csv",
+          "sha256": "143066cbbfb7dff32a7355a11a746783292264c8bdaaf08b7845af246a8e07f6"
+        },
+        {
+          "role": "rescaled_input",
+          "filename": "midas_lesion_626_rangematched_input_64x64_kPa.csv",
+          "sha256": "4a133ed1e2f3e2994bb3211c73c215eff451d38219799d7966e377a49f1b46d7"
+        }
+      ],
+      "display_8x8_source": {
+        "role": "resampled_8_by_8_field_display",
+        "filename": "delta_bz_8x8_bicubic.csv",
+        "sha256": "4a8294f6669ec3e44c193d977fe6ad7a558e99dc4fa24ef73a7fcf99727fe32a"
+      },
+      "probability_source": {
+        "role": "stage1_view_averaged_dermoscopy_probability",
+        "filename": "conditional_mask_stage1_mean_64x64.csv",
+        "sha256": "1f517c088f19c9a3bbb033250a9a44492fb71acdb7d88f47a3bb1841aa12651b"
+      }
+    },
+    {
+      "sample_id": "midas_lesion_218",
+      "diagnosis": "Melanoma in situ (modelled lesion)",
+      "split": "test",
+      "test_psnr_db": 11.93863010406494,
+      "test_ssim": 0.4768117070198059,
+      "recomputed_reconstruction_max_abs_difference_kPa": 7.61718749231477e-06,
+      "figure_input_values_changed_by_clipping": 0,
+      "sources": [
+        {
+          "role": "srcnn_reconstruction",
+          "filename": "midas_lesion_218_srcnn_reconstruction_64x64_kPa.csv",
+          "sha256": "d887c0611ae210655318787671393f2d46661a1a027ea29c6d6b67ede69d4c31"
+        },
+        {
+          "role": "modelled_forward_input",
+          "filename": "midas_lesion_218_modelled_modulus_64x64_kPa.csv",
+          "sha256": "cc75f9b7464ea0f337a7dd11bd7a4a8923c43ee8536294e3eb9f85a33850d5e5"
+        },
+        {
+          "role": "dermoscopy_probability",
+          "filename": "midas_lesion_218_lesion_probability_stage1_64x64.csv",
+          "sha256": "8135e9362cf9ca2d2473fac2989d8bbb182c010c0faab971fa824d027e01ad1e"
+        },
+        {
+          "role": "rescaled_input",
+          "filename": "midas_lesion_218_rangematched_input_64x64_kPa.csv",
+          "sha256": "3d24a2ca7b6a6e2f31f8878d4493025a26c663dc5e9308b98cc920058b402ed2"
+        }
+      ],
+      "display_8x8_source": {
+        "role": "resampled_8_by_8_field_display",
+        "filename": "delta_bz_8x8_bicubic.csv",
+        "sha256": "86eccdb1b60aab52fffe326502e9d88f66885f6aca606600b9cb203f03b34558"
+      },
+      "probability_source": {
+        "role": "stage1_view_averaged_dermoscopy_probability",
+        "filename": "conditional_mask_stage1_mean_64x64.csv",
+        "sha256": "646ffca9678d0bb887307e4156fdd86b387dab5ba118f2b565640f4f09a9d726"
+      }
+    }
+  ],
+  "modulus_display_range_kPa": [
+    71.17301940917969,
+    240.06137084960938
+  ],
+  "probability_definition": "Stage-1 dermoscopy segmentation probabilities averaged over lesion views and bilinearly resampled to a 64x64 map; not reconstruction uncertainty.",
+  "numerical_grid": [
+    64,
+    64
+  ],
+  "field_display_grid": [
+    8,
+    8
+  ],
+  "source_chain": "Archived training cache and selected checkpoint -> SI_Fig21_regenerated numerical outputs -> SI_Fig21_revised_20261005 presentation revision. The earlier input-display export supplies resampled 8x8 arrays.",
+  "presentation_scope": "The recorded October 5 artwork revision preserves source CSV values. It is a presentation variant; this record identifies numerical sources, not byte identity with every later manuscript layout.",
+  "source_artifacts": [
+    {
+      "role": "numerical_figure_generation_script",
+      "filename": "make_si21.py",
+      "sha256": "f66fe675d9e0530f86c088057249f9a15cca639f84c2286456353860eb656946"
+    },
+    {
+      "role": "figure_source_notes",
+      "filename": "README_SI_Fig21_regenerated.md",
+      "sha256": "5df10d107d8a1b55f9c7192434df767d9df14c8c52774aad53dadb5f23a86f6a"
+    },
+    {
+      "role": "figure_numerical_summary",
+      "filename": "SI_Fig21_regenerated_stats.json",
+      "sha256": "c8db1b3997255167687a587686b421d47080d2e0d4fbb49b18ba764f6f6cd143"
+    },
+    {
+      "role": "presentation_revision_and_preserved_source_hashes",
+      "filename": "revision_manifest.json",
+      "sha256": "f417cecd5f64fa112a58b66cebd038bc77a5e1bf26437dcebd6de30eadc3e7d1"
+    }
+  ],
+  "public_release": "Metadata and hashes only; source arrays, checkpoint and original artwork are not bundled."
+}
